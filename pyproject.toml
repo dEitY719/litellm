@@ -1,0 +1,13 @@
+[project]
+name = "litellm-langchain-agent"
+version = "0.1.0"
+description = "A simple LangChain agent using litellm."
+dependencies = [
+    "langchain",
+    "langchain-community",
+    "duckduckgo-search",
+    "litellm>=1.34.0",
+]
+
+[project.optional-dependencies]
+dev = ["uv"]

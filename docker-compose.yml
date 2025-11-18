@@ -59,7 +59,7 @@ services:
     environment:
       DATABASE_URL: "postgresql://llmproxy:dbpassword9090@db:5432/litellm"
       STORE_MODEL_IN_DB: "True" # allows adding models to proxy via UI
-      LITELLM_MASTER_KEY: "sk-4444" # Your master key for the proxy server. Can use this to send /chat/completion requests etc
+      LITELLM_MASTER_KEY: "sk-4444" # Your master key for the proxy server. Can use this to send /chat/completio
     depends_on:
       - db  # Indicates that this service depends on the 'db' service, ensuring 'db' starts first
     healthcheck:  # Defines the health check configuration for the container
