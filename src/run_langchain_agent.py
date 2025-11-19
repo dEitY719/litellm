@@ -16,7 +16,7 @@ from typing import Optional
 from langchain.agents import create_agent
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 from langchain_core.runnables import Runnable
-from langchain_community.chat_models.litellm import ChatLiteLLM
+from langchain_openai import ChatOpenAI
 from langchain_community.tools import DuckDuckGoSearchRun
 
 
@@ -28,14 +28,15 @@ SYSTEM_PROMPT = (
 )
 
 def create_agent_with_gemini() -> Optional[Runnable]:
-    """LangGraph 기반 Gemini 에이전트를 구성하고 그래프를 반환합니다."""
+    """LangGraph 기반 OpenAI 호환 에이전트를 구성하고 그래프를 반환합니다."""
 
     try:
-        print("[*] LiteLLM 프록시에서 Gemini 모델 초기화 중...")
-        llm = ChatLiteLLM(
-            model="gemini-pro",
-            api_base="http://localhost:4444",
+        print("[*] LiteLLM 프록시에서 모델 초기화 중 (OpenAI 호환 API)...")
+        llm = ChatOpenAI(
+            # model="tinyllama1",
+            model="gemini-2.5-pro",
             api_key="sk-4444",
+            base_url="http://localhost:4444/v1",
             temperature=0.7,
             max_tokens=2048,
             timeout=30,
