@@ -16,8 +16,6 @@ docker compose ps
 # NAME         IMAGE                                       STATUS
 # litellm      ghcr.io/berriai/litellm:main-v1.73.0-stable Up (healthy)
 # tinyllama1   ollama/ollama                               Up (healthy)
-# tinyllama2   ollama/ollama                               Up (healthy)
-# tinyllama3   ollama/ollama                               Up (healthy)
 # litellm_db   postgres:16                                 Up (healthy)
 ```
 

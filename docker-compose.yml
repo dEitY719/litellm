@@ -9,26 +9,6 @@ services:
     entrypoint: ollama
     command: serve
 
-  tinyllama2:
-    image: ollama/ollama
-    container_name: tinyllama2
-    ports:
-      - "11432:11434"
-    volumes:
-      - tinyllama2_data:/root/.ollama
-    entrypoint: ollama
-    command: serve
-
-  tinyllama3:
-    image: ollama/ollama
-    container_name: tinyllama3
-    ports:
-      - "11433:11434"
-    volumes:
-      - tinyllama3_data:/root/.ollama
-    entrypoint: ollama
-    command: serve
-
   db:
     image: postgres:16
     restart: always
@@ -73,8 +53,4 @@ volumes:
   postgres_data:
     name: litellm_postgres_data # Named volume for Postgres data persistence
   tinyllama1_data:
-    name: tinyllama1_data
-  tinyllama2_data:
-    name: tinyllama2_data
-  tinyllama3_data:
-    name: tinyllama3_data
+    name: tinyllama1_data  

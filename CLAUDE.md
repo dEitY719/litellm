@@ -72,8 +72,6 @@ docker compose up -d
 # Load models into Ollama instances (required once per service)
 # This downloads and caches the TinyLlama model (~50MB per instance)
 docker exec -it tinyllama1 ollama run tinyllama
-docker exec -it tinyllama2 ollama run tinyllama
-docker exec -it tinyllama3 ollama run tinyllama
 
 # Verify all containers are healthy
 docker compose ps
@@ -101,7 +99,7 @@ curl http://localhost:4444/v1/chat/completions \
   -H "Authorization: Bearer sk-4444" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "tinyllama2",
+    "model": "tinyllama1",
     "messages": [{"role": "user", "content": "Hello!"}]
   }'
 
@@ -182,8 +180,6 @@ docker compose up -d --force-recreate litellm
 |------|---------|----------|---------|
 | 4444 | litellm | 4000 | OpenAI-compatible proxy API |
 | 11431 | tinyllama1 | 11434 | First Ollama instance (local development) |
-| 11432 | tinyllama2 | 11434 | Second Ollama instance (local development) |
-| 11433 | tinyllama3 | 11434 | Third Ollama instance (local development) |
 | 5431 | PostgreSQL | 5432 | Database (for proxy configuration & credentials) |
 
 ### Data Persistence
