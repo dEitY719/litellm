@@ -1,4 +1,15 @@
-.PHONY: help up down logs ps health restart reset build pull
+.PHONY: help .env-setup up down logs ps health restart reset build pull logs-follow shell-litellm shell-db
+
+# Environment setup
+export LITELLM_PROJECT_PATH:=$(PWD)
+export LITELLM_URL:=http://localhost:4444
+export LITELLM_API_KEY:=sk-4444
+
+.env-setup:
+	@echo "✅ Environment variables configured:"
+	@echo "   LITELLM_PROJECT_PATH: $(LITELLM_PROJECT_PATH)"
+	@echo "   LITELLM_URL: $(LITELLM_URL)"
+	@echo "   LITELLM_API_KEY: $(LITELLM_API_KEY)"
 
 help:
 	@echo "LiteLLM Docker Compose Commands"
@@ -15,7 +26,7 @@ help:
 	@echo "make shell-litellm   - Access LiteLLM container shell"
 	@echo "make shell-db        - Access PostgreSQL container shell"
 
-up:
+up: .env-setup
 	@echo "Starting LiteLLM stack..."
 	docker compose up -d
 	@echo ""
