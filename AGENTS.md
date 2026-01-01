@@ -1,17 +1,56 @@
-# Repository Guidelines
+# Context & Governance
 
-## Project Structure & Module Organization
-Primary runtime assets live at the repository root, so keep layout flat and predictable. `docker-compose.yml` orchestrates the litellm proxy plus the three Ollama-backed `tinyllama{1..3}` services and postgres; treat it as the source of truth for service names, ports (4444), and health checks. `litellm_settings.yml` configures routed models, rate limits, and credentials; align any new provider blocks with the existing YAML schema before wiring them into Docker Compose. `README.md` doubles as the runbook; keep new operator notes near the relevant section rather than scattering new files.
+## 1. Project Context
+- **Goal**: Lightweight LiteLLM proxy wrapper with LangChain agents and Ollama backends.
+- **Stack**: Python, Docker Compose, LiteLLM, LangChain, Ollama.
+- **Structure**: Flat root for config/infra, `src/` for agent logic.
 
-## Build, Test, and Development Commands
-Spin up the full stack with `docker compose up -d`; it builds the litellm container, starts Ollama instances, and seeds postgres volumes. Use `docker compose logs -f litellm` while iterating on prompts or proxy features. First-time model loads require `docker exec -it tinyllamaN ollama run tinyllama` (run once per service) so the models stay cached. Shut down cleanly with `docker compose down -v` when you need a cold restart. Exercise the API proxy via `curl http://localhost:4444/models -H "Authorization: Bearer sk-4444"` and `/v1/chat/completions` requests to confirm new config takes effect.
+## 2. Operational Commands
+- **Start Stack**: `docker compose up -d`
+- **View Logs**: `docker compose logs -f litellm`
+- **Init Models**: `docker exec -it tinyllama1 ollama run tinyllama` (repeat for 2, 3)
+- **Smoke Test**: `curl http://localhost:4444/models -H "Authorization: Bearer sk-4444"`
+- **Chat Test**: `curl http://localhost:4444/v1/chat/completions -H "Content-Type: application/json" -d '{"model": "tinyllama", "messages": [{"role": "user", "content": "hi"}]}'`
+- **Linting**: `tox -e ruff`
+- **Shutdown**: `docker compose down -v`
 
-## Coding Style & Naming Conventions
-Compose files and settings stay in YAML with two-space indents and lowercase-hyphenated keys (e.g., `service-name`, `environment`). Container names follow `tinyllama<number>` so scripts can loop deterministically; match that pattern for additional replicas. Keep environment variables uppercase with underscores, and document defaults inside `litellm_settings.yml`. Comments should explain intent ("why we proxy this endpoint"), not implementation trivia.
+## 3. Golden Rules
 
-## Testing Guidelines
-Treat the curl probes as smoke tests: run the `/models` check whenever Compose changes, then send a short conversation payload to `/v1/chat/completions` for every new model mapping. When editing litellm routing logic, add regression scripts under `tests/` (create if missing) that replay representative prompts against the local proxy. Aim for coverage of each provider block you touch, and capture failures with response snippets in the PR description.
+### Immutable Constraints
+- **Line Limit**: This file must stay < 500 lines.
+- **Tokens**: No emojis, no secrets, no tables in Context Maps.
+- **Auth**: Always use `Authorization: Bearer sk-4444` for local proxy.
+- **Ports**: LiteLLM on `4444`.
 
-## Commit & Pull Request Guidelines
-Recent commits use short, imperative summaries (`update README`); follow that style and keep body lines wrapped at ~72 columns with bullet points for context. Reference an issue ID or ticket tag when available. PRs should list the commands run (`docker compose up -d`, curl smoke tests), describe any new environment variables, and include screenshots of GUI configuration changes. Request reviewers familiar with both Docker and litellm before merging and wait for green CI (or pasted log excerpts if CI is manual).
+### Do's & Don'ts
+- **DO**: Use `tinyllama{1..3}` naming pattern for services.
+- **DO**: Keep YAML indented with 2 spaces, lowercase-hyphenated keys.
+- **DO**: Use uppercase for all environment variables.
+- **DO**: Run smoke tests after every `docker-compose.yml` change.
+- **DON'T**: Hardcode secrets (use `.env` or `litellm_settings.yml`).
+- **DON'T**: Modify `litellm_settings.yml` without validating against schema.
 
+## 4. SOLID & Design Principles
+- **SRP**: Modules have one reason to change (e.g., separate config from agent logic).
+- **OCP**: Extend agent capabilities via new classes/tools, not by modifying core loop.
+- **LSP**: LLM provider implementations must be interchangeable.
+- **ISP**: Agents should only depend on tools they actually use.
+- **DIP**: High-level agents depend on abstract model interfaces, not concrete APIs.
+- **DRY**: Define model names and API keys in one place (`litellm_settings.yml`).
+
+## 5. TDD Protocol
+1. **Red**: Write a failing test (or smoke test script) for the new feature.
+2. **Green**: Implement minimal code/config to pass.
+3. **Refactor**: Optimize while keeping tests green.
+- **Coverage**: Critical logic in `src/` requires unit tests. Infra requires smoke tests.
+
+## 6. Standards & References
+- **Coding**: PEP 8 for Python, YAML 2-space indent.
+- **Git**: Conventional Commits (e.g., `feat: add new model`).
+- **Docs**: Update `README.md` for runbook changes.
+
+## 7. Context Map
+- **[Agent Logic](./src)** — LangChain agent implementations
+- **[Model Config](./litellm_settings.yml)** — Routing, rate limits, and credentials
+- **[Infrastructure](./docker-compose.yml)** — Service orchestration (LiteLLM + Ollama)
+- **[Dependencies](./pyproject.toml)** — Python package requirements

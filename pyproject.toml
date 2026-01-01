@@ -1,7 +1,13 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "litellm-langchain-agent"
 version = "0.1.0"
 description = "A simple LangChain agent using litellm."
+requires-python = ">=3.10"
+authors = [{ name = "dEitY719", email = "deity719@naver.com" }]
 dependencies = [
     "langchain",
     "langchain-community",
@@ -9,7 +15,37 @@ dependencies = [
     "duckduckgo-search",
     "litellm>=1.34.0",
     "ddgs>=9.9.1",
+    "rich>=14.1.0",
 ]
 
+[dependency-groups]
+dev = ["ruff", "mypy", "pylint-exit", "pytest", "pytest-mock", "tox>=4.26.0"]
+
 [project.optional-dependencies]
-dev = ["uv"]
+dev = [
+    "uv",
+    "types-toml",
+    "types-requests",
+    "types-PyYAML",
+]
+
+[tool.setuptools]
+packages = []
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.black]
+line-length = 120
+target-version = ['py310', 'py311', "py312", "py313"]
+skip-string-normalization = false
+exclude = '\.git|\.mypy_cache|\.tox|\.nox|\.venv|build|dist'
+
+[tool.isort]
+profile = "black"
+
+[tool.pylint]
+max-line-length = 120
+ignore = [".venv", ".tox", ".vscode", ".git", "build"]
+disable = ["R", "C", "W1203"]
